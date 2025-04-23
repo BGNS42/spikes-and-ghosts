@@ -5,6 +5,12 @@
 
 Ideia pós tutorial:
 
-// jogador tem 3 vidas. A cada vez que ele pega uma maçã, tem uma chance de 1 em 50 de aparecer um coração pra recuperar vida. Cada spike tira 20 pontos e 0.5 coração. Ao final, o score do player vai para um ranking.
+// jogador tem 3 vidas. A cada vez que ele pega uma maçã, tem uma chance de 1 em 10 de aparecer um coração pra recuperar vida. Cada spike tira 5 pontos e 1 coração. Ao final, o score do player vai para um ranking.
 
-Quando o boneco passar a borada, ele retorna pelo outro lado. Se sair pela direita aparece na esquerda e por ai vai.
+
+Como rodar no seu navegador 0.1
+- Abra o diretório que salvou a pasta do jogo com o terminal.
+- Digite `python -m http.server 888`
+- acesse http://localhost:8888/ em seu navegador
+
+*** deve ter pre requisitos antes, com instalar o Python

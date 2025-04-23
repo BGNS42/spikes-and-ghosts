@@ -56,6 +56,9 @@ class mainScene {
             this.lifeIcons.push(icon);
         }
 
+        // Exibir leaderboar
+        this.showLeaderboard();
+
     };
 
     update() {
@@ -90,6 +93,20 @@ class mainScene {
             // If the down arrow is pressed, move down
             this.player.y -= 3;
         }
+
+        // Loop horizontal e vertical (boneco não sai da tela)
+        // horizontal
+        if (this.player.x > 700) {
+            this.player.x = 0;
+        } else if (this.player.x < 0) {
+            this.player.x = 700;
+        }
+        // vertical
+        if (this.player.y > 400) {
+            this.player.y = 0;
+        } else if (this.player.y < 0) {
+            this.player.y = 400;
+        }
     };
 
     // Collisions
@@ -121,12 +138,22 @@ class mainScene {
         );
 
         // 1% de chance de criar um coração
-        if (Phaser.Math.Between(1, 15) === 1) {
+        if (Phaser.Math.Between(1, 5) === 1) {
             const heart = this.hearts.create(
                 Phaser.Math.Between(100,600),
                 Phaser.Math.Between(100,300),
                 'heart'
             );
+            heart.setScale(0.5);
+
+            this.tweens.add({
+                targets: heart,
+                scale: { from: 0.5, to: 0.6 },
+                duration: 150,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
         }
     }
 
@@ -142,12 +169,15 @@ class mainScene {
         // Diminui Score e Vida ao levar hit
         this.score -= 5;
         if(this.score < 0) { this.score = 0 };
+        let prev = this.lives;
         this.lives -= 1;
         if(this.lives <= 0) { // encerra o jogo se a vida chegar a 0
-            alert("GAME OVER");
-            this.scene.restart();
+            let playerName = prompt("GAME OVER!\nDigite seu nome para o leaderboard:");
+            if(!playerName) playerName = 'Sem nome';
+            this.saveScore(playerName, this.score); // salva o score e player
+            this.scene.restart(); // reseta o jogo
         }
-        this.updateLifeIcons();
+        this.updateLifeIcons(prev);
 
         // Display the updated score on the screen
         this.scoreText.setText('score: ' + this.score);
@@ -176,12 +206,13 @@ class mainScene {
         heart.destroy(); 
 
         if(this.lives < this.maxLives) {
+            let prev = this.lives;
             this.lives += 1;
-            this.updateLifeIcons();
+            this.updateLifeIcons(prev);
         }
     }
 
-    updateLifeIcons() {
+    updateLifeIcons(previousLives = this.lifeIcons.length) {
         // remove todos os ícones visuais
         this.lifeIcons.forEach(icon => icon.destroy());
         this.lifeIcons = [];
@@ -190,8 +221,70 @@ class mainScene {
         for(let i =0; i < this.lives; i++) {
             let icon = this.add.image(30 + i * 20, 60, 'heart');
             icon.setScale(0.5);
-            this.lifeIcons.push(icon); 
+            this.lifeIcons.push(icon);
+
+            // Se ganhou vida (ícones novos)
+            if (i >= previousLives) {
+                this.animateLifeGain(icon);
+            }
         }
+
+        // Se perdeu vida (mostra animação no último ícone anterior)
+        if (previousLives > this.lives) {
+            let lostIndex = this.lives; // o próximo após os atuais
+            let tempIcon = this.add.image(30 + lostIndex * 20, 60, 'heart');
+            tempIcon.setScale(0.5);
+            this.animateLifeLost(tempIcon);
+            this.time.delayedCall(500, () => tempIcon.destroy());
+        }
+    }
+
+    animateLifeLost(icon) {
+        this.tweens.add({
+            targets: icon,
+            alpha: 0,
+            duration: 100,
+            yoyo: true,
+            repeat: 2,
+            onComplete: () => {
+                icon.alpha = 1;
+            }
+        });
+    }
+
+    animateLifeGain(icon) {
+        this.tweens.add({
+            targets: icon,
+            scale: 0.6,
+            duration: 150,
+            yoyo: true,
+            onComplete: () => {
+                icon.setScale(0.5);
+            }
+        });
+    }
+
+    // Leaderboard
+    saveScore(name, score) { // SAVE
+        let scores = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        scores.push({ name, score });
+        scores.sort((a, b) => b.score - a.score); // ordena do maior pro menor
+        scores = scores.slice(0, 5); // mantém só os 5 maiores
+        localStorage.setItem('leaderboard', JSON.stringify(scores));
+    }
+
+    showLeaderboard() { // SHOW
+        let scores = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        const leaderboardEl = document.getElementById('leaderboard');
+        if (!leaderboardEl) return;
+
+        leaderboardEl.innerHTML = ''; // limpa antes de atualizar
+
+        scores.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `${entry.name}: ${entry.score}`;
+        leaderboardEl.appendChild(li);
+    });
     }
 }
 
