@@ -9,6 +9,10 @@ Ideia pós tutorial:
 
 
 Como rodar no seu navegador 0.1
+Acesse: https://bgns42.github.io/spikes-and-ghosts/
+
+ou
+
 - Abra o diretório que salvou a pasta do jogo com o terminal.
 - Digite `python -m http.server 888`
 - acesse http://localhost:8888/ em seu navegador
@@ -16,3 +20,7 @@ Como rodar no seu navegador 0.1
 *** deve ter pre requisitos antes, com instalar o Python
 
 ![alt text](image.png)
+
+## Próximos passos
+- efeitos sonoros;
+- ranking unificado
