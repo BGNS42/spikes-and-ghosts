@@ -14,3 +14,5 @@ Como rodar no seu navegador 0.1
 - acesse http://localhost:8888/ em seu navegador
 
 *** deve ter pre requisitos antes, com instalar o Python
+
+![alt text](image.png)
